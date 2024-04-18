@@ -32,7 +32,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+
 type Product = {
   id: number;
   name: string;
@@ -42,28 +44,17 @@ type Product = {
   get_image: string;
   get_thumbnail: string;
 };
+const latestProducts = ref<Product[]>([]);
 
-export default {
-  name: 'HomeView',
-  data(): { latestProducts: Product[] } {
-    return {
-      latestProducts: []
-    };
-  },
-  components: {},
-  mounted() {
-    this.getLatestProducts();
-  },
-  methods: {
-    async getLatestProducts() {
-      try {
-        const response = await fetch('http://localhost:8000/api/v1/latest-products/');
-        const json = await response.json();
-        this.latestProducts = json as Product[];
-      } catch (e) {
-        console.log('ERROR', e);
-      }
-    }
+async function getLatestProducts() {
+  try {
+    const response = await fetch('http://localhost:8000/api/v1/latest-products/');
+    const json = await response.json();
+    latestProducts.value = json as Product[];
+  } catch (e) {
+    console.log('ERROR', e);
   }
-};
+}
+
+onMounted(getLatestProducts);
 </script>
